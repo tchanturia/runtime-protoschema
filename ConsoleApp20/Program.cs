@@ -13,8 +13,12 @@ namespace ConsoleApp20
     {
         static void Main(string[] args)
         {
-            // protobuf-net stuff
+            //protobuff-net stuff
+
+            // generate .proto into string
             var protoDefinition = Serializer.GetProto<Yolo>();
+            
+            // compile .proto with protobuf-net instead of protoc and put into memory stream
             var nFileDescriptorSet = new nFileDescriptorSet();
             nFileDescriptorSet.Add("yolo.proto", source: new StringReader(protoDefinition));
             nFileDescriptorSet.Process();
@@ -23,10 +27,13 @@ namespace ConsoleApp20
             ms.Seek(0, SeekOrigin.Begin);
 
             // actual google stuff
+
+            // read compiled .proto and put into descriptor
             var fileDescriptionSet = FileDescriptorSet.Parser.ParseFrom(ms);
             var byteStrings = fileDescriptionSet.File.Select(f => f.ToByteString()).ToArray();
             var fileDescriptor = FileDescriptor.BuildFromByteStrings(byteStrings).First();
 
+            // yolo
             var protoData = new ProtoData
             {
                 WriterSchema = new ProtoSchema
